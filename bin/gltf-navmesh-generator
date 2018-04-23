@@ -1,0 +1,39 @@
+#!/usr/bin/env node
+
+const program = require("commander");
+const generateNavMeshJSON = require("../src/index");
+const fs = require("fs-extra");
+const path = require("path");
+const package = fs.readJSONSync(path.join(__dirname, "..", "package.json"));
+
+program
+  .version(package.version)
+  .usage('<gltfPath> <navMeshPath>')
+  .action((gltfPath, navMeshPath) => {
+    execute(gltfPath, navMeshPath).then(() => {
+      process.exit(0);
+    }).catch((err) => {
+      throw err;
+    });
+  });
+
+async function execute(gltfPath, navMeshPath) {
+
+  if (!fs.existsSync(gltfPath)) {
+    throw new Error(`gltf/glb file: ${gltfPath} does not exist`);
+  }
+
+  if (!navMeshPath.endsWith(".json")) {
+    throw new Error(`Nav mesh path must include the .json extension: ${navMeshPath}`);
+  }
+
+  const outputNavMeshPath = await generateNavMeshJSON(gltfPath, navMeshPath);
+
+  console.log(`Wrote navmesh to: ${outputNavMeshPath}`);
+}
+
+program.parse(process.argv);
+
+if (program.args.length === 0) {
+  program.outputHelp();
+}

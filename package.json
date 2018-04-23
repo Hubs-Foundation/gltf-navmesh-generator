@@ -1,0 +1,16 @@
+{
+  "name": "gltf-navmesh-generator",
+  "version": "1.0.0",
+  "main": "index.js",
+  "license": "MIT",
+  "scripts": {
+    "start": "node ./bin/gltf-navmesh-generator"
+  },
+  "dependencies": {
+    "commander": "^2.15.1",
+    "fs-extra": "^5.0.0",
+    "gltf-import-export": "^1.0.8",
+    "three": "^0.92.0",
+    "three-pathfinding": "^0.5.5"
+  }
+}

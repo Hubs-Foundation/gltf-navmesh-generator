@@ -16,8 +16,11 @@ const navMeshGltfPath = path.join(__dirname, "navmesh.gltf");
 // Where to output navmesh file
 const navMeshJSONPath = path.join(__dirname, "navmesh.json");
 
+// The name of the Object3D containing the navmesh geometry
+const navMeshObjName = "Navmesh";
+
 // Generates navmesh data that can be loaded in aframe via <a-entity nav-mesh="src: navmesh.json">
-const outNavMeshPath = await generateNavMeshJSON(navMeshGltfPath, navMeshJSONPath);
+const outNavMeshPath = await generateNavMeshJSON(navMeshGltfPath, navMeshJSONPath, navMeshObjName);
 ```
 
 ## CLI Usage
@@ -27,7 +30,7 @@ npm install -g gltf-navmesh-generator
 ```
 
 ```
-  Usage: gltf-navmesh-generator <gltfPath> <navMeshPath>
+  Usage: gltf-navmesh-generator <gltfPath> <navMeshPath> <navMeshObjName>
 
   Options:
 

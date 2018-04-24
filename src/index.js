@@ -1,9 +1,26 @@
 const fs = require("fs-extra");
 const crypto = require("crypto");
 const path = require("path");
-// TODO: Avoid leaking/overwriting THREE global.
+
+/**
+ * Setup THREE.GLTFLoader for use in nodejs
+ */
+// TODO: Avoid leaking/overwriting global variables
+const { JSDOM } =  require("jsdom");
+const { window, document } = new JSDOM();
+global.window = window;
+global.document = document;
+window.URL.createObjectURL = () => {};
+window.URL.revokeObjectURL = () =>{};
+global.URL = window.URL;
+global.Blob = window.Blob;
 global.THREE = require("three");
+THREE.TextureLoader.prototype.load = (url, onLoad) => {
+  setTimeout(() => onLoad(new THREE.Texture()), 0);
+};
 require("three/examples/js/loaders/GLTFLoader");
+
+
 const Builder = require("three-pathfinding/src/Builder");
 const { ConvertGltfToGLB } = require("gltf-import-export");
 
@@ -24,19 +41,26 @@ function parseGlbAsync(glbArrayBuffer) {
   });
 }
 
-module.exports = async function generateNavMeshJSON(gltfPath, navMeshPath) {
-  let glbPath = gltfPath;
+async function readToArrayBuffer(gltfPath) {
+  let glbBuffer;
 
   if (gltfPath.endsWith(".gltf")) {
-    glbPath = path.join(path.basename(gltfPath, ".gltf"), "navmesh_temp.glb");
+    glbPath = path.join(path.parse(gltfPath).dir, "navmesh_temp.glb");
     ConvertGltfToGLB(gltfPath, glbPath);
+    glbBuffer = await fs.readFile(glbPath);
+    await fs.remove(glbPath);
+  } else {
+    glbBuffer = await fs.readFile(glbPath);
   }
 
-  const glbBuffer = await fs.readFile(glbPath);
-  const glbArrayBuffer = toArrayBuffer(glbBuffer);
+  return toArrayBuffer(glbBuffer);
+}
+
+module.exports = async function generateNavMeshJSON(gltfPath, navMeshPath, navMeshObjName) {
+  const glbArrayBuffer = await readToArrayBuffer(gltfPath);
   const { scene } = await parseGlbAsync(glbArrayBuffer);
 
-  const navMeshObj = scene.getObjectByName("Navmesh");
+  const navMeshObj = scene.getObjectByName(navMeshObjName);
 
   if (!navMeshObj) {
     throw new Error("Navmesh Object3D not found");

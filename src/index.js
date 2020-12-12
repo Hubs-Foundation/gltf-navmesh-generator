@@ -1,5 +1,4 @@
 const fs = require("fs-extra");
-const crypto = require("crypto");
 const path = require("path");
 
 /**
@@ -50,7 +49,7 @@ async function readToArrayBuffer(gltfPath) {
     glbBuffer = await fs.readFile(glbPath);
     await fs.remove(glbPath);
   } else {
-    glbBuffer = await fs.readFile(glbPath);
+    glbBuffer = await fs.readFile(gltfPath);
   }
 
   return toArrayBuffer(glbBuffer);
@@ -63,7 +62,7 @@ module.exports = async function generateNavMeshJSON(gltfPath, navMeshPath, navMe
   const navMeshObj = scene.getObjectByName(navMeshObjName);
 
   if (!navMeshObj) {
-    throw new Error("Navmesh Object3D not found");
+    throw new Error(`Navmesh ${navMeshObjName} Object3D not found`);
   }
 
   const geometry = new THREE.Geometry().fromBufferGeometry(navMeshObj.geometry);

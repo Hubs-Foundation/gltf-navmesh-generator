@@ -6,7 +6,7 @@
   "license": "MPL-2.0",
   "repository": {
     "type": "git",
-    "url": "https://github.com/MozillaReality/gltf-navmesh-generator.git"
+    "url": "https://github.com/Hubs-Foundation/gltf-navmesh-generator.git"
   },
   "scripts": {
     "start": "node ./bin/gltf-navmesh-generator"
